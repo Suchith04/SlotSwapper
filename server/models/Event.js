@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const statusEnum = ["Available","busy","Swap Pending"];
+const statusEnum = ["available","accepted","Pending"];
 
 const eventSchema = new mongoose.Schema({
     userId:{
@@ -23,11 +23,7 @@ const eventSchema = new mongoose.Schema({
         type:String,
         required:true,
         enum:statusEnum
-    },
-    swapId:{
-        type:String
-    },
-
+    }
 });
 
 export default mongoose.model("Event",eventSchema);

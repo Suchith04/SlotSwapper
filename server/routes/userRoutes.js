@@ -1,11 +1,12 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import authMiddleware from '../middleware/authMiddleware.js';
 import Event from "../models/Event.js";
 import Requests from "../models/SwapReq.js";
 
 const router = express.Router();
 
-router.get("/swappable-slots",authMiddleware,async(req,res)=>{
+router.get("/swappable-slots",authMiddleware,async(req,res)=>{ // slots that are swappable(other than users slots)
     const {id,email} = req.user;
     try{
         const events = await Event.find({isSwappable:true,userId:{$ne:id}});
@@ -19,13 +20,30 @@ router.get("/swappable-slots",authMiddleware,async(req,res)=>{
     }
 });
 
-// POST /api/swap-request
-// This endpoint should accept the ID of the user's slot (mySlotId) and the ID of the desired slot (theirSlotId).
-// Server-side logic: You must verify that both slots exist and are currently SWAPPABLE. -- Done
-// Create a new SwapRequest record (e.g., with a PENDING status), linking the two slots and users. --Done
-// Update the status of both original slots to SWAP_PENDING to prevent them from being offered in other swaps.
+router.get("/my-slots",authMiddleware,async(req,res)=>{ // users slots to show on Dashboard
+    const {id,email} = req.user;
+    try{
+        const events = await Event.find({userId:id});
+        res.json(events);
+    }
+    catch (err) {
+        console.error("error getting slots", err);
+        res.status(500).json({
+        message: "Server error while getting slots",
+        });
+    }
+});
 
-router.post("/swap-request",authMiddleware,async(req,res)=>{
+router.get("/my-swappable", authMiddleware, async (req, res) => { //users own swappable reqs
+  try {
+    const events = await Event.find({ userId: req.user.id, isSwappable: true });
+    res.json(events);
+  } catch (err) {
+    res.status(500).json({ message: "Server error fetching your swappable slots" });
+  }
+});
+
+router.post("/swap-request",authMiddleware,async(req,res)=>{ //send a new swap request
     const {user_Slot_Id,desired_Slot_Id} = req.body;
     // verifying 
     try{
@@ -75,37 +93,68 @@ router.post("/swap-request",authMiddleware,async(req,res)=>{
     } 
 });
 
-router.get("/swap-response",authMiddleware,async(req,res)=>{
+router.get("/swaps-sent",authMiddleware,async(req,res)=>{ //how many have swap reqs have you sent
+  const id = req.user.id;
+  try{
+    const sent = await Requests.find({from:id});
+    res.status(201).json(sent);
+  }
+  catch(err){
+    res.json(500).json({message:"Internal Server Error"});
+  }
+})
+
+router.patch("/events/:id/update", authMiddleware, async (req, res) => { // swappable 
+  const { id } = req.params;
+  const { isSwappable, status } = req.body;
+  const userId = req.user.id;
+
+  try {
+    const updated = await Event.findOneAndUpdate(
+      { _id: id, userId },
+      { $set: { isSwappable, status } },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ message: "Event not found" });
+    res.json({ event: updated });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error updating event" });
+  }
+});
+
+
+router.get("/swaps-received",authMiddleware,async(req,res)=>{ //notificatons received for swaps
     const {id,email} = req.user;
     try{
         const notfications = await Requests.find({to:id});
         res.status(201).json(notfications);
     }
     catch(err){
-        res.json(500).json({message:"Int Svr Err"});
+        res.status(500).json({message:"Int Svr Err"});
     }
 })
 
-router.post("/swap-response/:requestId", authMiddleware, async (req, res) => {
+router.post("/swap-response/:requestId", authMiddleware, async (req, res) => { //accept or reject a request
   const { requestId } = req.params;
   const { accept } = req.body;
   const userId = req.user.id; 
 
   try {
     
-    const swapRequest = await Request.findById(requestId);
+    const swapRequest = await Requests.findById(requestId);
     if (!swapRequest) {
       return res.status(404).json({ success: false, message: "Swap request not found" });
     }
 
 
-    if (swapRequest.receiverId !== userId) {
+    if (swapRequest.to !== userId) {
       return res.status(403).json({ success: false, message: "Not authorized to respond to this swap" });
     }
 
     
-    const offeredEvent = await Event.findById(swapRequest.offeredEventId);
-    const requestedEvent = await Event.findById(swapRequest.requestedEventId);
+    const offeredEvent = await Event.findById(swapRequest.offeredID);
+    const requestedEvent = await Event.findById(swapRequest.receivedID);
 
     if (!offeredEvent || !requestedEvent) {
       return res.status(404).json({ success: false, message: "Event not found" });
@@ -117,6 +166,9 @@ router.post("/swap-response/:requestId", authMiddleware, async (req, res) => {
       offeredEvent.isSwappable = true;
       requestedEvent.isSwappable = true;
 
+      offeredEvent.status = "available";
+      requestedEvent.status = "available"
+
       await Promise.all([
         swapRequest.save(),
         offeredEvent.save(),
@@ -126,40 +178,30 @@ router.post("/swap-response/:requestId", authMiddleware, async (req, res) => {
       return res.status(200).json({ success: true, message: "Swap request rejected" });
     }
 
-    
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    try {
-      const tempUserId = offeredEvent.userId;
-      offeredEvent.userId = requestedEvent.userId;
-      requestedEvent.userId = tempUserId;
+    const tempUserId = offeredEvent.userId;
+  offeredEvent.userId = requestedEvent.userId;
+  requestedEvent.userId = tempUserId;
 
-      offeredEvent.isSwappable = false;
-      requestedEvent.isSwappable = false;
+  // Update flags and statuses
+  offeredEvent.isSwappable = false;
+  requestedEvent.isSwappable = false;
 
-      offeredEvent.status = "busy";
-      requestedEvent.status = "busy";
+  offeredEvent.status = "available";
+  requestedEvent.status = "available";
 
-      swapRequest.status = "accepted";
+  swapRequest.status = "accepted";
 
-      await Promise.all([
-        offeredEvent.save({ session }),
-        requestedEvent.save({ session }),
-        swapRequest.save({ session }),
-      ]);
+  // Save all changes in parallel (no session/transaction needed)
+  await Promise.all([
+    offeredEvent.save(),
+    requestedEvent.save(),
+    swapRequest.save(),
+  ]);
 
-      await session.commitTransaction();
-      session.endSession();
-
-      res.status(200).json({
-        success: true,
-        message: "Swap successfully completed",
-      });
-    } catch (err) {
-      await session.abortTransaction();
-      session.endSession();
-      throw err;
-    }
+  res.status(200).json({
+    success: true,
+    message: "Swap successfully completed",
+  });
   } catch (err) {
     console.error("Error responding to swap:", err);
     res.status(500).json({
@@ -169,11 +211,11 @@ router.post("/swap-response/:requestId", authMiddleware, async (req, res) => {
   }
 });
 
-router.post("/add",authMiddleware,async(req,res)=>{
+router.post("/add",authMiddleware,async(req,res)=>{ //adding Events (Time Slots) on Calendar
     const {title,isSwappable,d_Date} = req.body;
     try{
         const newEvent = new Event({
-            userId:res.user.id,
+            userId:req.user.id,
             d_Date,
             isSwappable,
             title,
@@ -181,11 +223,14 @@ router.post("/add",authMiddleware,async(req,res)=>{
 
         });
         await newEvent.save();
+        res.status(201).json({
+            message: "Event created successfully",
+            event: newEvent
+        });
     }catch(err){
         console.log(err);
         res.status(500).json({message:"Internal Server Error"});
     }
-
 })
 
 export default router;

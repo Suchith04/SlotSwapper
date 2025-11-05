@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const statusEnum = ["Accepted", "Rejected", "Pending"];
+const statusEnum = ["accepted", "rejected", "Pending"];
 
 const swapReqSchema = new mongoose.Schema({
     from:{
