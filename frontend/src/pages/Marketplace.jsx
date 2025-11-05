@@ -61,7 +61,7 @@ const Marketplace = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {availableSlots.map((slot) => (
-          <div key={slot._id} className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+          <div key={slot.id} className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
             <h3 className="text-xl font-semibold text-gray-800 mb-2">{slot.title}</h3>
             <p className="text-gray-600 mb-2">Date: {new Date(slot.d_Date).toLocaleDateString()}</p>
             <span className={`inline-block px-3 py-1 rounded-full text-sm mb-4 ${
