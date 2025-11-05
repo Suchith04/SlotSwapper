@@ -60,24 +60,24 @@ const Requests = () => {
             ) : (
               incoming.map((req) => (
                 <div
-                  key={req._id}
+                  key={req.id}
                   className="bg-white rounded-lg shadow-md p-6 border border-gray-200"
                 >
                   <div className="mb-4">
                     <p className="text-sm text-gray-600">
                       <span className="font-medium text-gray-800">Offered by:</span> {req.offered_by}
                     </p>
-                    <p className="text-sm text-gray-600 mt-1">
-                      <span className="font-medium">Offered Event:</span> {req.offered_event?.name || 'N/A'}
-                    </p>
+                    {/* <p className="text-sm text-gray-600 mt-1">
+                      <span className="font-medium">Offered Event:</span> {req.offered_event || 'N/A'}
+                    </p> */}
                     <p className="text-sm text-gray-600">
-                      <span className="font-medium">Offered Date:</span> {formatDate(req.offered_event?.date)}
+                      <span className="font-medium">Offered Date:</span> {formatDate(req.date_of_offered_event)}
                     </p>
-                    <p className="text-sm text-gray-600 mt-1">
-                      <span className="font-medium">Your Event:</span> {req.requested_event?.name || 'N/A'}
-                    </p>
+                    {/* <p className="text-sm text-gray-600 mt-1">
+                      <span className="font-medium">Your Event:</span> {req.requested_event|| 'N/A'}
+                    </p> */}
                     <p className="text-sm text-gray-600">
-                      <span className="font-medium">Your Event Date:</span> {formatDate(req.requested_event?.date)}
+                      <span className="font-medium">Your Event Date:</span> {formatDate(req.date_of_requested_event)}
                     </p>
 
                     <span
@@ -131,17 +131,17 @@ const Requests = () => {
                     <p className="text-sm text-gray-600">
                       <span className="font-medium text-gray-800">Sent To:</span> {req.sent_to}
                     </p>
-                    <p className="text-sm text-gray-600 mt-1">
+                    {/* <p className="text-sm text-gray-600 mt-1">
                       <span className="font-medium">Your Event:</span> {req.offered_event?.name || 'N/A'}
-                    </p>
+                    </p> */}
                     <p className="text-sm text-gray-600">
-                      <span className="font-medium">Your Event Date:</span> {formatDate(req.offered_event?.date)}
+                      <span className="font-medium">Your Event Date:</span> {formatDate(req.date_of_offered_event)}
                     </p>
-                    <p className="text-sm text-gray-600 mt-1">
+                    {/* <p className="text-sm text-gray-600 mt-1">
                       <span className="font-medium">Requested Event:</span> {req.requested_event?.name || 'N/A'}
-                    </p>
+                    </p> */}
                     <p className="text-sm text-gray-600">
-                      <span className="font-medium">Requested Date:</span> {formatDate(req.requested_event?.date)}
+                      <span className="font-medium">Requested Event Date:</span> {formatDate(req.date_of_requested_event)}
                     </p>
 
                     <span
