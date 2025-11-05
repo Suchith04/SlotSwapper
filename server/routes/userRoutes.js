@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import authMiddleware from '../middleware/authMiddleware.js';
 import Event from "../models/Event.js";
 import Requests from "../models/SwapReq.js";
+import User from "../models/User.js";
 
 const router = express.Router();
 
@@ -93,16 +94,50 @@ router.post("/swap-request",authMiddleware,async(req,res)=>{ //send a new swap r
     } 
 });
 
-router.get("/swaps-sent",authMiddleware,async(req,res)=>{ //how many have swap reqs have you sent
-  const id = req.user.id;
-  try{
-    const sent = await Requests.find({from:id});
-    res.status(201).json(sent);
+// Simpler One
+// router.get("/swaps-sent",authMiddleware,async(req,res)=>{ //how many have swap reqs have you sent
+//   const id = req.user.id;
+//   try{
+//     const sent = await Requests.find({from:id});
+//     res.status(201).json(sent);
+//   }
+//   catch(err){
+//     res.json(500).json({message:"Internal Server Error"});
+//   }
+// })
+
+router.get("/swaps-sent", authMiddleware, async (req, res) => { // how many swap reqs have you sent?
+  const { id } = req.user; 
+
+  try {
+    const sentRequests = await Requests.find({ from: id });
+
+    const result = await Promise.all(
+      sentRequests.map(async (reqItem) => {
+        const [toUser, offeredEvent, requestedEvent] = await Promise.all([
+          User.findById(reqItem.to).select("name"),
+          Event.findById(reqItem.offeredID).select("d_Date"),
+          Event.findById(reqItem.receivedID).select("d_Date"),
+        ]);
+
+        return {
+          sent_to: toUser ? toUser.name : "Unknown",
+          date_of_offered_event: offeredEvent ? offeredEvent.d_Date : null,
+          date_of_requested_event: requestedEvent ? requestedEvent.d_Date : null,
+          status: reqItem.status 
+        };
+      })
+    );
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
   }
-  catch(err){
-    res.json(500).json({message:"Internal Server Error"});
-  }
-})
+});
+
+
+
 
 router.patch("/events/:id/update", authMiddleware, async (req, res) => { // swappable 
   const { id } = req.params;
@@ -123,17 +158,52 @@ router.patch("/events/:id/update", authMiddleware, async (req, res) => { // swap
   }
 });
 
+//Simpler One
+// router.get("/swaps-received",authMiddleware,async(req,res)=>{ //notificatons received for swaps
+//     const {id,email} = req.user;
+//     try{
+//         const notfications = await Requests.find({to:id});
+//         res.status(201).json(notfications);
+//     }
+//     catch(err){
+//         res.status(500).json({message:"Int Svr Err"});
+//     }
+// })
 
-router.get("/swaps-received",authMiddleware,async(req,res)=>{ //notificatons received for swaps
-    const {id,email} = req.user;
-    try{
-        const notfications = await Requests.find({to:id});
-        res.status(201).json(notfications);
-    }
-    catch(err){
-        res.status(500).json({message:"Int Svr Err"});
-    }
-})
+
+router.get("/swaps-received", authMiddleware, async (req, res) => {
+  const { id } = req.user;
+
+  try {
+    const requests = await Requests.find({ to: id });
+
+    const result = await Promise.all(
+      requests.map(async (reqItem) => {
+        
+        const [fromUser, offeredEvent, requestedEvent] = await Promise.all([
+          User.findById(reqItem.from).select("name"),
+          Event.findById(reqItem.offeredID).select("d_Date"),
+          Event.findById(reqItem.receivedID).select("d_Date"),
+        ]);
+
+        return {
+          offered_by: fromUser ? fromUser.name : "Unknown",
+          date_of_offered_event: offeredEvent ? offeredEvent.d_Date : null,
+          date_of_requested_event: requestedEvent ? requestedEvent.d_Date : null,
+          status : reqItem.status,
+          id:reqItem._id
+        };
+      })
+    );
+
+    
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 
 router.post("/swap-response/:requestId", authMiddleware, async (req, res) => { //accept or reject a request
   const { requestId } = req.params;
@@ -166,8 +236,8 @@ router.post("/swap-response/:requestId", authMiddleware, async (req, res) => { /
       offeredEvent.isSwappable = true;
       requestedEvent.isSwappable = true;
 
-      offeredEvent.status = "available";
-      requestedEvent.status = "available"
+      offeredEvent.status = "Available";
+      requestedEvent.status = "Available"
 
       await Promise.all([
         swapRequest.save(),

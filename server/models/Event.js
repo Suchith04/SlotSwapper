@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const statusEnum = ["available","accepted","Pending"];
+const statusEnum = ["Available","available","accepted","Pending"];
 
 const eventSchema = new mongoose.Schema({
     userId:{
