@@ -101,6 +101,27 @@ You can access the app at:
 
 ---
 
+## 📸 Demo Screenshots
+
+### 🔐 Authentication Pages
+| Signup | Login |
+|:--:|:--:|
+<img width="1920" height="982" alt="image" src="https://github.com/user-attachments/assets/5944d7c3-27c4-4c40-a389-9a06243e251e" />
+
+
+### 🗓️ Dashboard
+| My Slots | Marketplace |
+|:--:|:--:|
+| <img width="1920" height="884" alt="image" src="https://github.com/user-attachments/assets/33b9fd2e-1bd5-4dfc-87a0-35bea84d3977" /> | <img width="1363" height="599" alt="image" src="https://github.com/user-attachments/assets/3378b80b-5c4d-44d4-b29c-7c8a0f44f792" /> |
+
+### 🔁 Swap Requests
+| Sent Requests | Received Requests |
+|:--:|:--:|
+| <img width="1898" height="870" alt="image" src="https://github.com/user-attachments/assets/b2f309d7-db9e-4072-a102-5200b2abd9ca" /> |
+
+
+---
+
 ## 🚧 Challenges Faced
 
 ### 🧩 Schema Linking
@@ -118,13 +139,18 @@ Despite that, the UI remains clean and functional across devices.
 With limited time, some planned features like **email verification**, **calendar integration**, and **role-based access control** were postponed.
 Developed The Project in About 12 Hours
 
+### 🧠 Debugging Realization
+
+I  wasted a **lot of time debugging the frontend**, only to realize later that the issue was in the **backend API — I had forgotten a `return` statement**.
+This experience taught me the importance of verifying backend logic before assuming a frontend issue.
+
 ---
 
 ## 🚀 Future Improvements
 
+* ✅ Refactor into **microservice-based routes** for scalability.
 * ✅ Integrate **Google Calendar API** for a dynamic calendar view.
 * ✅ Add **email verification** and password recovery.
-* ✅ Refactor into **microservice-based routes** for scalability.
 * ✅ Optimize schemas for better relational queries using `populate()`.
 * ✅ Improve UI/UX and introduce notifications for swap updates(can use **AWS SNS & SQS** for realtime notifications).
 
