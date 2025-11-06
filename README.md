@@ -101,6 +101,31 @@ You can access the app at:
 
 ---
 
+## 🚀 Deployment Links
+[👉 View Live App]([Application](https://slot-swapper-deploy.vercel.app/))  
+[🔗 Backend API]([Backend](https://slotswapper-bmao.onrender.com))
+
+---
+
+## 📸 Demo Screenshots
+
+### 🔐 Authentication Pages
+| Signup | Login |
+|:--:|:--:|
+| ![Signup Page](./screenshots/signup.png) | ![Login Page](./screenshots/login.png) |
+
+### 🗓️ Dashboard
+| My Slots | Marketplace |
+|:--:|:--:|
+| ![My Slots](./screenshots/dashboard.png) | ![Marketplace](./screenshots/marketplace.png) |
+
+### 🔁 Swap Requests
+| Sent Requests | Received Requests |
+|:--:|:--:|
+| ![Sent Requests](./screenshots/sent.png) | ![Received Requests](./screenshots/received.png) |
+
+---
+
 ## 📸 Demo Screenshots
 
 ### 🔐 Authentication Pages
