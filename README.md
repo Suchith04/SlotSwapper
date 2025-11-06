@@ -102,34 +102,18 @@ You can access the app at:
 ---
 
 ## 🚀 Deployment Links
-[👉 View Live App]([Application](https://slot-swapper-deploy.vercel.app/))  
-[🔗 Backend API]([Backend](https://slotswapper-bmao.onrender.com))
+[👉 View Live App](https://slot-swapper-deploy.vercel.app/)  
+[🔗 Backend API](https://slotswapper-bmao.onrender.com)
+
+---
+
 
 ---
 
 ## 📸 Demo Screenshots
 
 ### 🔐 Authentication Pages
-| Signup | Login |
-|:--:|:--:|
-| ![Signup Page](./screenshots/signup.png) | ![Login Page](./screenshots/login.png) |
-
-### 🗓️ Dashboard
-| My Slots | Marketplace |
-|:--:|:--:|
-| ![My Slots](./screenshots/dashboard.png) | ![Marketplace](./screenshots/marketplace.png) |
-
-### 🔁 Swap Requests
-| Sent Requests | Received Requests |
-|:--:|:--:|
-| ![Sent Requests](./screenshots/sent.png) | ![Received Requests](./screenshots/received.png) |
-
----
-
-## 📸 Demo Screenshots
-
-### 🔐 Authentication Pages
-| Signup | Login |
+| Signup |
 |:--:|:--:|
 <img width="1920" height="982" alt="image" src="https://github.com/user-attachments/assets/5944d7c3-27c4-4c40-a389-9a06243e251e" />
 
@@ -140,7 +124,7 @@ You can access the app at:
 | <img width="1920" height="884" alt="image" src="https://github.com/user-attachments/assets/33b9fd2e-1bd5-4dfc-87a0-35bea84d3977" /> | <img width="1363" height="599" alt="image" src="https://github.com/user-attachments/assets/3378b80b-5c4d-44d4-b29c-7c8a0f44f792" /> |
 
 ### 🔁 Swap Requests
-| Sent Requests | Received Requests |
+| Sent Requests & Received Requests |
 |:--:|:--:|
 | <img width="1898" height="870" alt="image" src="https://github.com/user-attachments/assets/b2f309d7-db9e-4072-a102-5200b2abd9ca" /> |
 
@@ -185,7 +169,7 @@ This experience taught me the importance of verifying backend logic before assum
 
 **Suchith Marupaka**
 📧 *marupakasuchith@gmail.com*
-💼 *[linkedin.com/](https://www.linkedin.com/in/suchith014/)*
+💼 *[linkedin.com/in/suchith014](https://www.linkedin.com/in/suchith014/)*
 
 ---
 
